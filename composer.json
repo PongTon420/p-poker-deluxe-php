@@ -1,0 +1,14 @@
+{
+  "name": "vendor_name/poker_php",
+  "description": "友達とポーカーをするゲームだ。",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "ポントン",
+      "email": "tututien123@gmail.com"
+    }
+  ],
+  "require": {
+  }
+}
