@@ -12,8 +12,10 @@ class Deck
                 $ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"];
 
                 foreach ($suits as $suit) {
+                        $score = 2;
                         foreach ($ranks as $rank) {
-                                array_push($this->cards, new Card($suit, $rank));
+                                array_push($this->cards, new Card($suit, $rank, $score));
+                                $score++;
                         }
                 }
                 shuffle($this->cards);
