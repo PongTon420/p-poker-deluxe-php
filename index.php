@@ -13,17 +13,30 @@
         </form>
 </body>
 </html>
+
 <?php
-require_once 'Card.php';
-require_once 'Deck.php';
-        if (isset($_POST["submit"])) {
-                $deck = new Deck();
-                $cards = $deck->getCards();
-                $players = array("PongTon", "Deng");
-                $deck->dealCard($players, count($players));
-                $deck->takeTopCard()->displayCard();
-                $deck->takeTopCard()->displayCard();
-                $deck->takeTopCard()->displayCard();
-                $deck->takeTopCard()->displayCard();
-                $deck->takeTopCard()->displayCard();
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use RinTohsaka\Objects\Deck;
+use RinTohsaka\Objects\Card;
+use RinTohsaka\People\Player;
+use RinTohsaka\People\Dealer;
+
+if (isset($_POST["submit"])) {
+        $deck = new Deck();
+        $dealer = new Dealer($deck);
+        $players = array(new Player("PongTon"), new Player("Deng"));
+        $dealer->dealCard($players);
+        foreach ($players as $player) {
+                echo $player->getName() . "<br>";
+                foreach ($player->getCardsInHands() as $card) {
+                        echo $card->displayCard() . "<br>";
+                }
+                echo "<br>";
         }
+        $communityCards = $deck->drawAmountOfCards(5);
+        foreach ($communityCards as $card) {
+                echo $card->displayCard() . "<br>";
+        }
+}
