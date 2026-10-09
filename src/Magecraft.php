@@ -81,13 +81,14 @@ class Magecraft
                  * */
         }
 
-        public static function isFourOfAKind(array $cards) : bool
+        public static function isAnyOfAKind(array $cards, int $kindNumber) : bool
         {
+                // For 4OfAKind, 3OfAKind, Pair
                 $scoreDupesDescOrder = self::countScoreDupesDescOrder($cards);
                 $highestCountScore = array_key_first($scoreDupesDescOrder);
                 $numberOfCountScore = $scoreDupesDescOrder[$highestCountScore];
 
-                if ($numberOfCountScore == 4) {
+                if ($numberOfCountScore == $kindNumber) {
                         return true;
                 }
 
@@ -111,16 +112,36 @@ class Magecraft
                 return false;
         }
 
+        public static function isTwoPairs(array $cards) : bool
+        {
+                // Same 4OfAKind logic but find for 2 twice
+                // Just read 4OfAKind logic for future maintenance
+                $scoreDupesDescOrder = self::countScoreDupesDescOrder($cards);
+                $numberOfCountScore = $scoreDupesDescOrder[array_key_first($scoreDupesDescOrder)];
+                if ($numberOfCountScore == 2) {
+                        array_shift($scoreDupesDescOrder);
+                        $numberOfCountScore = $scoreDupesDescOrder[array_key_first($scoreDupesDescOrder)];
+                        if ($numberOfCountScore == 2) {
+                                return true;
+                        }
+                }
+
+                return false;
+        }
+
         public static function computeHand(?array $handCards, array$communityCards) : string
         {
-                $bestHand = "Nothing";
+                // always choose the best hand
+                // this function does not consider when players result in a draw
+                // that case will be a TODO: for future PongTon's unlimited php works
+                $bestHand = "High card";
 
                 $cards = array_merge($handCards, $communityCards);
 
                 if (self::isFlush($cards) && self::isStraight($cards)) {
                         $bestHand = "Straight flush";
                 }
-                else if (self::isFourOfAKind($cards)) {
+                else if (self::isAnyOfAKind($cards, 4)) {
                         $bestHand = "Four of a kind";
                 }
                 else if (self::isFullHouse($cards)) {
@@ -131,6 +152,15 @@ class Magecraft
                 }
                 else if (self::isStraight($cards)) {
                         $bestHand = "Straight";
+                }
+                else if (self::isAnyOfAKind($cards, 3)) {
+                        $bestHand = "Three of a kind";
+                }
+                else if (self::isTwoPairs($cards)) {
+                        $bestHand = "Two pairs";
+                }
+                else if (self::isAnyOfAKind($cards, 2)) {
+                        $bestHand = "Pair";
                 }
 
                 return $bestHand;
