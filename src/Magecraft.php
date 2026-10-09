@@ -61,18 +61,31 @@ class Magecraft
                 return false;
         }
 
-        public static function isFourOfAKind(array $cards) : bool
+        public static function countScoreDupesDescOrder(array $cards) : array
         {
                 $scores = null;
                 foreach ($cards as $card) {
                         $scores[] = $card->getScore();
                 }
-
                 $arrCountDupes = array_count_values($scores);
-
                 arsort($arrCountDupes);
-                $highestCountScore = array_key_first($arrCountDupes);
-                $numberOfCountScore = $arrCountDupes[$highestCountScore];
+                return $arrCountDupes;
+                /*
+                 * return Output:
+                 * Array = [
+                 *              score:2 => frequency: 3
+                 *              score:4 => frequency: 2 <- Desc order
+                 *              score:14 => frequency: 1
+                 *              ...
+                 * ] Desc order of frequency
+                 * */
+        }
+
+        public static function isFourOfAKind(array $cards) : bool
+        {
+                $scoreDupesDescOrder = self::countScoreDupesDescOrder($cards);
+                $highestCountScore = array_key_first($scoreDupesDescOrder);
+                $numberOfCountScore = $scoreDupesDescOrder[$highestCountScore];
 
                 if ($numberOfCountScore == 4) {
                         return true;
@@ -81,9 +94,26 @@ class Magecraft
                 return false;
         }
 
+        public static function isFullHouse(array $cards) : bool
+        {
+                // Same 4OfAKind logic but find for 3 and 2
+                // Just read 4OfAKind logic for future maintenance
+                $scoreDupesDescOrder = self::countScoreDupesDescOrder($cards);
+                $numberOfCountScore = $scoreDupesDescOrder[array_key_first($scoreDupesDescOrder)];
+                if ($numberOfCountScore == 3) {
+                        array_shift($scoreDupesDescOrder);
+                        $numberOfCountScore = $scoreDupesDescOrder[array_key_first($scoreDupesDescOrder)];
+                        if ($numberOfCountScore == 2) {
+                                return true;
+                        }
+                }
+
+                return false;
+        }
+
         public static function computeHand(?array $handCards, array$communityCards) : string
         {
-                $bestHand = "";
+                $bestHand = "Nothing";
 
                 $cards = array_merge($handCards, $communityCards);
 
@@ -92,6 +122,9 @@ class Magecraft
                 }
                 else if (self::isFourOfAKind($cards)) {
                         $bestHand = "Four of a kind";
+                }
+                else if (self::isFullHouse($cards)) {
+                        $bestHand = "Full house";
                 }
                 else if (self::isFlush($cards)) {
                         $bestHand = "Flush";
